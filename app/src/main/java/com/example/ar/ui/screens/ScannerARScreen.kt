@@ -3,8 +3,6 @@ package com.example.ar.ui.screens
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
@@ -23,7 +21,6 @@ import com.example.ar.R
 
 import com.example.ar.ui.components.StepCard
 import com.example.ar.ui.components.CategoryItem
-import androidx.compose.foundation.border
 import com.example.ar.ui.components.BottomMenu
 import com.example.ar.ui.components.TopBar
 
@@ -216,16 +213,16 @@ fun ScannerARScreen(
                 Text("SmartHome", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Spacer(modifier = Modifier.height(20.dp))
                 Text("Accueil", modifier = Modifier.fillMaxWidth().clickable { isMenuOpen = false; onNavigateHome() }.padding(10.dp))
-                Text("Catalogue", modifier = Modifier.fillMaxWidth().clickable { isMenuOpen = false }.padding(10.dp))
+                Text("Catalogue", modifier = Modifier.fillMaxWidth().clickable { isMenuOpen = false; onNavigateToCatalogue() }.padding(10.dp))
 
-                // 2. ربط زر "Mes Projets" فـ المنيو الجانبي
+
                 Text(
                     "Mes Projets",
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
                             isMenuOpen = false
-                            onNavigateToProjects() // التنقل لصفحة المشاريع
+                            onNavigateToProjects()
                         }
                         .padding(10.dp)
                 )
@@ -243,12 +240,11 @@ fun ScannerARScreen(
             }
         }
 
-        // 3. ربط BottomMenu بزيادة الباراميتر الجديد
         BottomMenu(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .fillMaxWidth(0.9f)
-                .padding(bottom = 15.dp),
+                .fillMaxWidth(0.9f),
+            selectedItem = -1,
             onNavigateHome = onNavigateHome,
             onNavigateToProfile = onNavigateToProfile,
             onNavigateToProjects = onNavigateToProjects,

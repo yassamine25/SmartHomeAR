@@ -22,6 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AR"
+rootProject.name = "SmartHomeAR"
 include(":app")
  

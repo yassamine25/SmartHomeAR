@@ -21,37 +21,91 @@ fun SignInScreen(onGoToSignUp: () -> Unit, onLoginSuccess: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        AppHeader(title = "Sign In")
+        AppHeader(title = "Connectez")
         Spacer(modifier = Modifier.height(40.dp))
         CustomCard {
-            CustomInput(label = "Email Address", value = email, onValueChange = { email = it })
+            CustomInput(label = "Email ou numéro du téléphone", value = email, onValueChange = { email = it })
             Spacer(modifier = Modifier.height(16.dp))
-            CustomInput(label = "Password", value = pass, onValueChange = { pass = it }, isPassword = true)
+            CustomInput(label = "Mot de passe", value = pass, onValueChange = { pass = it }, isPassword = true)
             Spacer(modifier = Modifier.height(32.dp))
             PrimaryButton(text = "Continue", onClick = onLoginSuccess)
             Spacer(modifier = Modifier.height(24.dp))
-            NavigationLink(text1 = "Don't have an account? ", text2 = "Sign Up", onClick = onGoToSignUp)
+            NavigationLink(text1 = "vous n'avez pas de compte? ", text2 = "Inscrivez_Vous", onClick = onGoToSignUp)
         }
     }
 }
 
 @Composable
-fun SignUpScreen(onRegisterSuccess: (String) -> Unit, onBackToSignIn: () -> Unit) {
+fun SignUpScreen(
+    onRegisterSuccess: (String) -> Unit,
+    onBackToSignIn: () -> Unit
+) {
+    var nom by remember { mutableStateOf("") }
+    var prenom by remember { mutableStateOf("") }
+    var date by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        AppHeader(title = "Sign Up")
+
+        AppHeader(title = "Inscrivez")
         Spacer(modifier = Modifier.height(40.dp))
+
         CustomCard {
-            CustomInput(label = "Phone number", value = phone, onValueChange = { phone = it })
+
+            CustomInput(
+                label = "Nom",
+                value = nom,
+                onValueChange = { nom = it }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            CustomInput(
+                label = "Prénom",
+                value = prenom,
+                onValueChange = { prenom = it }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            CustomInput(
+                label = "Date de naissance",
+                value = date,
+                onValueChange = { date = it }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            CustomInput(
+                label = "Email ou numéro du téléphone",
+                value = phone,
+                onValueChange = { phone = it }
+            )
+
             Spacer(modifier = Modifier.height(32.dp))
-            PrimaryButton(text = "Continue", onClick = { if (phone.isNotEmpty()) onRegisterSuccess(phone) })
+
+            PrimaryButton(
+                text = "Continuer",
+                onClick = {
+                    if (phone.isNotEmpty()) {
+                        onRegisterSuccess(phone)
+                    }
+                }
+            )
+
             Spacer(modifier = Modifier.height(24.dp))
-            NavigationLink(text1 = "Already have an account? ", text2 = "Sign In", onClick = onBackToSignIn)
+
+            NavigationLink(
+                text1 = "Vous avez déjà un compte ? ",
+                text2 = "Se connecter",
+                onClick = onBackToSignIn
+            )
         }
     }
 }
@@ -68,7 +122,7 @@ fun VerificationScreen(phoneNumber: String, onVerifySuccess: () -> Unit, onBack:
         AppHeader(title = "Verify")
         Spacer(modifier = Modifier.height(40.dp))
         CustomCard {
-            // استعملنا MainBlack اللي كاين فـ Components
+
             Text(
                 text = "Enter the code sent to you at $phoneNumber",
                 color = MainBlack,

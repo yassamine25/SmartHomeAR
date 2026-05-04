@@ -1,13 +1,18 @@
 package com.example.ar.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -15,47 +20,215 @@ import com.example.ar.ui.components.*
 
 @Composable
 fun ProfileScreen(
+    currentScreen: String,
     onNavigateHome: () -> Unit,
+    onNavigateToProfile: () -> Unit,
+    onNavigateToProjects: () -> Unit,
+    onNavigateToCatalogue: () -> Unit,
     onLogout: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(LightBg)
-            .padding(horizontal = 24.dp)
-    ) {
-        // 1. Top Bar (زر الرجوع)
-        Row(
+
+    var isMenuOpen by remember { mutableStateOf(false) }
+
+    val customBlue = Color(0xFF1A0BE9)
+    val activeColor = Color(0xFF1A0BE9)
+    val inactiveColor = Color.Gray
+
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .background(LightBg)
+                .padding(bottom = 80.dp)
         ) {
-            IconButton(onClick = onNavigateHome) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = MainBlack)
+
+            // 🔹 TOP BAR
+            Column(modifier = Modifier.fillMaxSize().padding(20.dp)) {
+                TopBar(
+                    onMenuClick = { isMenuOpen = !isMenuOpen },
+                    onLogoClick = { onNavigateHome() }
+                )
+
+
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // 🔹 AVATAR + INFOS
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(Color.LightGray),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(50.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text("user", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text("user.1@gmail.com", color = GrayText, fontSize = 14.sp)
+                    Text("+212 601 205 306", color = GrayText, fontSize = 14.sp)
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // 🔹 STATS
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    ProfileStat("5", "Projets")
+                    ProfileStat("2", "Favoris")
+                    ProfileStat("3", "AR scans")
+                }
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // 🔹 ACTIONS
+                ProfileActionItem("Mes Projets") { onNavigateToProjects() }
+                ProfileActionItem("Catalogue") { onNavigateToCatalogue() }
+
+                Spacer(modifier = Modifier.height(120.dp))
+
+                // 🔹 LOGOUT
+                SimpleLogoutButton(onClick = onLogout)
             }
-            Text(
-                "Mon Profil",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = MainBlack
+        }
+        // 🔥 DRAWER MENU
+        if (isMenuOpen) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.4f))
+                    .clickable { isMenuOpen = false }
             )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(220.dp)
+                    .background(Color.White)
+                    .padding(20.dp)
+            ) {
+
+                Text("SmartHome", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = customBlue)
+
+                Spacer(modifier = Modifier.height(30.dp),)
+
+                Text(
+                    "Accueil",
+                    color = if (currentScreen == "home") activeColor else inactiveColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            isMenuOpen = false
+                            onNavigateHome()
+                        }
+                        .padding(12.dp)
+                )
+
+                Text(
+                    "Catalogue",
+                    color = if (currentScreen == "catalogue") activeColor else inactiveColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.fillMaxWidth().clickable {
+                        isMenuOpen = false
+                        onNavigateToCatalogue()
+                    }.padding(12.dp)
+                )
+
+                Text(
+                    "Mes Projets",
+                    color = if (currentScreen == "projects") activeColor else inactiveColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.fillMaxWidth().clickable {
+                        isMenuOpen = false
+                        onNavigateToProjects()
+                    }.padding(12.dp)
+                )
+
+                Text(
+                    "Profil",
+                    color = if (currentScreen == "profile") activeColor else inactiveColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.fillMaxWidth().clickable {
+                        isMenuOpen = false
+                        onNavigateToProfile()
+                    }.padding(12.dp)
+                )
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                Text(
+                    "Se déconnecter",
+                    color = Color.Red,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            isMenuOpen = false
+                            onLogout()
+                        }
+                        .padding(12.dp)
+                )
+            }
+
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
 
-        // 2. عرض معلومات المستخدم فقط ✅
-        UserInfoCard(
-            name = "AR scanner",
-            email = "scanner.ar@design.studio",
-            phone = "+212 600 000 000"
+        BottomMenu(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth(0.9f),
+            selectedItem = 2,
+            onNavigateHome = onNavigateHome,
+            onNavigateToProfile = onNavigateToProfile,
+            onNavigateToProjects = onNavigateToProjects,
+            onNavigateToCatalogue = onNavigateToCatalogue
         )
+    }
+}
 
-        Spacer(modifier = Modifier.weight(1f)) // دفع الزر للأسفل
 
-        // 3. زر تسجيل الخروج
-        SimpleLogoutButton(onClick = onLogout)
+@Composable
+fun ProfileStat(number: String, label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(number, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(label, color = GrayText, fontSize = 12.sp)
+    }
+}
 
-        Spacer(modifier = Modifier.height(40.dp))
+
+@Composable
+fun ProfileActionItem(title: String, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White)
+            .clickable { onClick() }
+            .padding(16.dp)
+    ) {
+        Text(title, fontWeight = FontWeight.Medium)
     }
 }

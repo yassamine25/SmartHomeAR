@@ -148,16 +148,15 @@ fun ARPlacementScreen(
                 Text("SmartHome", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Spacer(modifier = Modifier.height(20.dp))
                 Text("Accueil", modifier = Modifier.fillMaxWidth().clickable { isMenuOpen = false; onNavigateHome() }.padding(10.dp))
-                Text("Catalogue", modifier = Modifier.fillMaxWidth().clickable { isMenuOpen = false }.padding(10.dp))
+                Text("Catalogue", modifier = Modifier.fillMaxWidth().clickable { isMenuOpen = false; onNavigateToCatalogue() }.padding(10.dp))
 
-                // 2. ربط زر "Mes Projets" فـ المنيو الجانبي
                 Text(
                     "Mes Projets",
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
                             isMenuOpen = false
-                            onNavigateToProjects() // الربط هنا
+                            onNavigateToProjects()
                         }
                         .padding(10.dp)
                 )
@@ -175,12 +174,11 @@ fun ARPlacementScreen(
             }
         }
 
-        // 3. ربط BottomMenu بزيادة الباراميتر الناقص (onNavigateToProjects)
         BottomMenu(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .fillMaxWidth(0.9f)
-                .padding(bottom = 15.dp),
+                .fillMaxWidth(0.9f),
+            selectedItem = -1,
             onNavigateHome = onNavigateHome,
             onNavigateToProfile = onNavigateToProfile,
             onNavigateToProjects = onNavigateToProjects,

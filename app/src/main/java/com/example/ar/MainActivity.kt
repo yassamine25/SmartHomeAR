@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
                     var userPhone by remember { mutableStateOf("") }
 
                     when (currentScreen) {
-                        // --- 1. شاشات التسجيل ---
+
                         "signin" -> SignInScreen(
                             onGoToSignUp = { currentScreen = "signup" },
                             onLoginSuccess = { currentScreen = "home" }
@@ -37,26 +37,41 @@ class MainActivity : ComponentActivity() {
 
                         // --- 2. الشاشات الرئيسية ---
                         "home" -> SmartHomeScreen(
+                            currentScreen = "home",
                             onNavigateToScanner = { currentScreen = "scanner" },
                             onNavigateHome = { },
                             onNavigateToProfile = { currentScreen = "profile" },
                             onNavigateToProjects = { currentScreen = "projects" },
-                            onNavigateToCatalogue = { currentScreen = "catalogue" } // ✅ زدنا الربط للكاطالوج
+                            onNavigateToCatalogue = { currentScreen = "catalogue" },
+                            onLogout = { currentScreen = "signin" }
                         )
 
-                        "catalogue" -> CatalogueScreen( // ✅ زدنا حالة شاشة الكاطالوج
+                        "catalogue" -> CatalogueScreen(
+                            currentScreen = "catalogue",
                             onNavigateHome = { currentScreen = "home" },
                             onNavigateToProfile = { currentScreen = "profile" },
                             onNavigateToProjects = { currentScreen = "projects" },
-                            onNavigateToCatalogue = { }
+                            onNavigateToCatalogue = { },
+                            onLogout = { currentScreen = "signin" },
+                            onNavigateToAR = { currentScreen = "ar" }
+
                         )
 
                         "projects" -> ProjectsScreen(
-                            onNavigateHome = { currentScreen = "home" }
+                            currentScreen = "projects",
+                            onNavigateHome = { currentScreen = "home" },
+                            onNavigateToProfile = { currentScreen = "profile" },
+                            onNavigateToProjects = { },
+                            onNavigateToCatalogue = { currentScreen = "catalogue" },
+                            onLogout = { currentScreen = "signin" }
                         )
 
                         "profile" -> ProfileScreen(
+                            currentScreen = "profile",
                             onNavigateHome = { currentScreen = "home" },
+                            onNavigateToProfile = { },
+                            onNavigateToProjects = { currentScreen = "projects" },
+                            onNavigateToCatalogue = {  currentScreen = "catalogue" },
                             onLogout = { currentScreen = "signin" }
                         )
 

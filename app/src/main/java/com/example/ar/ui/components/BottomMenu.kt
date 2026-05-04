@@ -18,10 +18,11 @@ import com.example.ar.R
 @Composable
 fun BottomMenu(
     modifier: Modifier = Modifier,
+    selectedItem: Int,
     onNavigateHome: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToProjects: () -> Unit,
-    onNavigateToCatalogue: () -> Unit // 1. زدنا هاد الباراميتر هنا
+    onNavigateToCatalogue: () -> Unit
 ){
     Box(
         modifier = modifier
@@ -31,7 +32,7 @@ fun BottomMenu(
             .background(Color(0xFFCFDEEC))
             .padding(horizontal = 20.dp, vertical = 8.dp)
     ) {
-        var selectedItem by remember { mutableIntStateOf(0) }
+
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -40,25 +41,18 @@ fun BottomMenu(
         ) {
             // Home
             BottomItem("Accueil", R.drawable.ic_home, selectedItem == 0) {
-                selectedItem = 0
                 onNavigateHome()
             }
 
-            // Search (ربطناه بالكاطالوج)
-            BottomItem("Rechercher", R.drawable.ic_search, selectedItem == 1) {
-                selectedItem = 1
-                onNavigateToCatalogue() // 2. هنا كيتم الربط
+            BottomItem("Catalogue", R.drawable.ic_catalogue, selectedItem == 1) {
+                onNavigateToCatalogue()
             }
 
-            // Profile
             BottomItem("Profil", R.drawable.ic_user, selectedItem == 2) {
-                selectedItem = 2
                 onNavigateToProfile()
             }
 
-            // Projects
-            BottomItem("Projets", R.drawable.ic_heart, selectedItem == 3) {
-                selectedItem = 3
+            BottomItem("Mes Projets", R.drawable.ic_image, selectedItem == 3) {
                 onNavigateToProjects()
             }
         }

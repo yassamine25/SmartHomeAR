@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun ProductCard(name: String, price: String, image: Int) {
+fun ProductCard(name: String, price: String, image: Int, onClickAR: () -> Unit = {} ) {
     Card(
         modifier = Modifier
             .width(130.dp)
@@ -49,7 +49,9 @@ fun ProductCard(name: String, price: String, image: Int) {
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Button(
-                    onClick = {},
+                    onClick = {
+                        onClickAR?.invoke()
+                    },
                     modifier = Modifier.height(30.dp).fillMaxWidth(),
                     contentPadding = PaddingValues(0.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A0BE9))

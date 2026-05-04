@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun TopBar(
+    currentScreen: String = "",
     showCancel: Boolean = false,
     onCancelClick: () -> Unit = {},
     onMenuClick: () -> Unit = {},

@@ -4,7 +4,6 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
@@ -25,17 +24,21 @@ import com.example.ar.ui.components.TopBar
 
 @Composable
 fun SmartHomeScreen(
+    currentScreen: String,
     onNavigateToScanner: () -> Unit,
     onNavigateHome: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToProjects: () -> Unit,
-    onNavigateToCatalogue: () -> Unit // 1. زدنا هاد الطريق لصفحة الكاطالوج
+    onNavigateToCatalogue: () -> Unit,
+    onLogout: () -> Unit
 ){
     var isMenuOpen by remember { mutableStateOf(false) }
 
     val customBlue = Color(0xFF1A0BE9)
     val customLightBlue = Color(0xFF6C63FF)
     val gradient = Brush.horizontalGradient(listOf(customBlue, customLightBlue))
+    val activeColor = Color(0xFF1A0BE9)
+    val inactiveColor = Color.Gray
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -44,7 +47,7 @@ fun SmartHomeScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(bottom = 80.dp)
         ) {
-            Box(modifier = Modifier.height(480.dp)) {
+            Box(modifier = Modifier.height(460.dp)) {
                 Image(
                     painter = painterResource(R.drawable.sofa),
                     contentDescription = null,
@@ -139,11 +142,11 @@ fun SmartHomeScreen(
             Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 SectionTitle("Nos recommandations")
                 Text(text = "Voir plus", color = customBlue, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.clickable {
-                    onNavigateToCatalogue() // ربطنا "Voir plus" حتى هي بالكاطالوج
+                    onNavigateToCatalogue()
                 })
             }
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
                 ProductCard("chaise", "1500 DH", R.drawable.chaise)
@@ -152,7 +155,7 @@ fun SmartHomeScreen(
             }
         }
 
-        // --- Drawer Menu (Side Menu) ---
+
         if (isMenuOpen) {
             Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { isMenuOpen = false })
 
@@ -160,41 +163,79 @@ fun SmartHomeScreen(
                 Text("SmartHome", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = customBlue)
                 Spacer(modifier = Modifier.height(30.dp))
 
-                Text("Accueil", modifier = Modifier.fillMaxWidth().clickable { isMenuOpen = false; onNavigateHome() }.padding(12.dp))
-
-                // 2. ربط زر "Catalogue" فـ المنيو الجانبي
                 Text(
-                    "Catalogue",
+                    "Accueil",
+                    color = if (currentScreen == "home") activeColor else inactiveColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
                             isMenuOpen = false
-                            onNavigateToCatalogue()
+                            onNavigateHome()
                         }
                         .padding(12.dp)
+                )
+
+                Text(
+                    "Catalogue",
+                    color = if (currentScreen == "catalogue") activeColor else inactiveColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.fillMaxWidth().clickable {
+                        isMenuOpen = false
+                        onNavigateToCatalogue()
+                    }.padding(12.dp)
                 )
 
                 Text(
                     "Mes Projets",
+                    color = if (currentScreen == "projects") activeColor else inactiveColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.fillMaxWidth().clickable {
+                        isMenuOpen = false
+                        onNavigateToProjects()
+                    }.padding(12.dp)
+                )
+
+                Text(
+                    "Profil",
+                    color = if (currentScreen == "profile") activeColor else inactiveColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.fillMaxWidth().clickable {
+                        isMenuOpen = false
+                        onNavigateToProfile()
+                    }.padding(12.dp)
+                )
+                Spacer(modifier = Modifier.height(30.dp))
+
+                Text(
+                    "Se déconnecter",
+                    color = Color.Red,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
                             isMenuOpen = false
-                            onNavigateToProjects()
+                            onLogout()
                         }
                         .padding(12.dp)
                 )
-
-                Text("Profil", modifier = Modifier.fillMaxWidth().clickable { isMenuOpen = false; onNavigateToProfile() }.padding(12.dp))
             }
         }
 
         BottomMenu(
-            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(0.9f).padding(bottom = 15.dp),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth(0.9f),
+            selectedItem = 0,
             onNavigateHome = onNavigateHome,
             onNavigateToProfile = onNavigateToProfile,
             onNavigateToProjects = onNavigateToProjects,
-            onNavigateToCatalogue = onNavigateToCatalogue // 3. تمرير الأكشن للـ BottomMenu (البحث)
+            onNavigateToCatalogue = onNavigateToCatalogue
         )
     }
 }

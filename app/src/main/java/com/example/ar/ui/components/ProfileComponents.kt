@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// قطعة عرض معلومات المستخدم (صورة، اسم، إيميل)
+
 @Composable
 fun UserInfoCard(name: String, email: String, phone: String) {
     Column(
@@ -27,12 +27,12 @@ fun UserInfoCard(name: String, email: String, phone: String) {
             .padding(vertical = 30.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // دائرة الصورة الشخصية
+
         Box(
             modifier = Modifier
                 .size(120.dp)
                 .clip(CircleShape)
-                .background(SoftFieldBg), // اللون الرمادي الفاتح اللي عرفناه سابقا
+                .background(SoftFieldBg),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -64,7 +64,7 @@ fun UserInfoCard(name: String, email: String, phone: String) {
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        // رقم الهاتف (إضافي بما أننا في تطبيق AR يحتاج تواصل)
+
         Text(
             text = phone,
             fontSize = 14.sp,
@@ -74,7 +74,7 @@ fun UserInfoCard(name: String, email: String, phone: String) {
     }
 }
 
-// زر تسجيل الخروج بسيط في الأسفل
+
 @Composable
 fun SimpleLogoutButton(onClick: () -> Unit) {
     Button(
@@ -82,7 +82,7 @@ fun SimpleLogoutButton(onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFEBEE)), // أحمر خفيف جدا
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFEBEE)),
         shape = RoundedCornerShape(16.dp),
         elevation = null
     ) {
