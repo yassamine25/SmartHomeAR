@@ -1,0 +1,58 @@
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+}
+
+android {
+    namespace = "com.example.ar"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "com.example.ar"
+        minSdk = 26
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        // Kotlin 1.9.24 => Compose Compiler 1.5.14
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
+    
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+    
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+
+kotlin {
+    jvmToolchain(11)
+}
+
+dependencies {
+    implementation(libs.androidx.core.ktx)
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    
+    // Compose BOM
+    implementation(platform(libs.androidx.compose.bom))
+    
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation(libs.androidx.activity.compose)
+
+
+    debugImplementation(libs.androidx.ui.tooling)
+}
