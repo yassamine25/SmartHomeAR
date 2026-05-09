@@ -25,9 +25,7 @@ import com.example.ar.ui.components.BottomMenu
 import com.example.ar.ui.components.TopBar
 
 import android.Manifest
-import android.app.Activity
 import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.compose.ui.platform.LocalContext
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -35,7 +33,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.lifecycle.LifecycleOwner
 
 @Composable
@@ -270,8 +267,7 @@ fun ScannerARScreen(
                         .background(gradient)
                         .shadow(10.dp, RoundedCornerShape(30.dp))
                         .clickable {
-                            val intent = android.content.Intent(context, com.example.ar.ARActivity::class.java)
-                            context.startActivity(intent)
+                            onNavigateToAR()
                         }
                         .padding(horizontal = 24.dp, vertical = 10.dp)
                 ) {

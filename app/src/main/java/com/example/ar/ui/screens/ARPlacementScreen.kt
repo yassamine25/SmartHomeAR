@@ -18,7 +18,6 @@ import androidx.compose.ui.geometry.Offset
 import com.example.ar.R
 import com.example.ar.ui.components.TopBar
 import com.example.ar.ui.components.BottomMenu
-import androidx.compose.ui.viewinterop.AndroidView
 
 @Composable
 fun ARPlacementScreen(
@@ -27,7 +26,6 @@ fun ARPlacementScreen(
     onNavigateToProjects: () -> Unit,
     onNavigateToCatalogue: () -> Unit
 ) {
-
     var isMenuOpen by remember { mutableStateOf(false) }
 
     val customBlue = Color(0xFF1A0BE9)
@@ -37,23 +35,25 @@ fun ARPlacementScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
 
+        Image(
+            painter = painterResource(R.drawable.sofa),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+            alpha = 0.9f
+        )
 
-
-        // OVERLAY
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = 0.2f))
         )
 
-        // CONTENU PRINCIPAL
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(20.dp)
         ) {
-
-            // TOPBAR
             TopBar(
                 onMenuClick = { isMenuOpen = !isMenuOpen },
                 onLogoClick = { onNavigateHome() }
@@ -61,7 +61,6 @@ fun ARPlacementScreen(
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            // ANNULER + DÉPLACER
             Box(modifier = Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier
@@ -110,20 +109,78 @@ fun ARPlacementScreen(
             Spacer(modifier = Modifier.weight(1f))
         }
 
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.85f)
+                .height(200.dp)
+                .align(Alignment.Center)
+        ) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val stroke = 6f
+                drawLine(customBlue, Offset(0f, 0f), Offset(size.width, 0f), stroke)
+                drawLine(customBlue, Offset(0f, size.height), Offset(size.width, size.height), stroke)
+                drawLine(customBlue, Offset(0f, 0f), Offset(0f, size.height), stroke)
+                drawLine(customBlue, Offset(size.width, 0f), Offset(size.width, size.height), stroke)
+            }
 
+            val points = listOf(
+                Alignment.TopStart,
+                Alignment.TopEnd,
+                Alignment.BottomStart,
+                Alignment.BottomEnd
+            )
 
-        // MENU BURGER
+            points.forEach {
+                Box(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clip(CircleShape)
+                        .background(Color.White)
+                        .align(it)
+                )
+            }
+        }
+
         if (isMenuOpen) {
             Box(
-                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { isMenuOpen = false }
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.4f))
+                    .clickable { isMenuOpen = false }
             )
+
             Column(
-                modifier = Modifier.fillMaxHeight().width(220.dp).background(Color.White).padding(20.dp)
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(220.dp)
+                    .background(Color.White)
+                    .padding(20.dp)
             ) {
                 Text("SmartHome", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+
                 Spacer(modifier = Modifier.height(20.dp))
-                Text("Accueil", modifier = Modifier.fillMaxWidth().clickable { isMenuOpen = false; onNavigateHome() }.padding(10.dp))
-                Text("Catalogue", modifier = Modifier.fillMaxWidth().clickable { isMenuOpen = false; onNavigateToCatalogue() }.padding(10.dp))
+
+                Text(
+                    "Accueil",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            isMenuOpen = false
+                            onNavigateHome()
+                        }
+                        .padding(10.dp)
+                )
+
+                Text(
+                    "Catalogue",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            isMenuOpen = false
+                            onNavigateToCatalogue()
+                        }
+                        .padding(10.dp)
+                )
 
                 Text(
                     "Mes Projets",
