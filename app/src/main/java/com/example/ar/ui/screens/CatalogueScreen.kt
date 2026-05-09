@@ -31,7 +31,8 @@ import com.example.ar.ui.components.BottomMenu
 import com.example.ar.ui.components.TopBar
 import com.example.ar.ui.components.ProductCard
 
-// م
+import com.example.ar.data.ApiProduct
+import com.example.ar.data.RetrofitInstance
 data class Product(val name: String, val price: String, val image: Int)
 
 @Composable
@@ -53,12 +54,18 @@ fun CatalogueScreen(
     val activeColor = Color(0xFF1A0BE9)
     val inactiveColor = Color.Gray
 
-    val products = listOf(
-        Product("Chaise", "1200 DH", R.drawable.chaise),
-        Product("Table 1", "2500 DH", R.drawable.table1),
-        Product("Table 2", "3000 DH", R.drawable.table2),
-        Product("Canapé", "12000 DH", R.drawable.sofa)
-    )
+    var products by remember { mutableStateOf<List<ApiProduct>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        try {
+            products = RetrofitInstance.api.getProducts()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            isLoading = false
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
@@ -124,8 +131,8 @@ fun CatalogueScreen(
             gridItems(products) { product ->
                 ProductCard(
                     name = product.name,
-                    price = product.price,
-                    image = product.image,
+                    price = "${product.price} DH",
+                    image = R.drawable.sofa,
                     onClickAR = {
                         onNavigateToAR()
                     }
