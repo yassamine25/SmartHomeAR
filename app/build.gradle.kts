@@ -55,4 +55,14 @@ dependencies {
 
 
     debugImplementation(libs.androidx.ui.tooling)
+
+    implementation("com.google.ar:core:1.43.0")
+
+    implementation("androidx.camera:camera-camera2:1.3.0")
+    implementation("androidx.camera:camera-lifecycle:1.3.0")
+    implementation("androidx.camera:camera-view:1.3.0")
+
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+
+    implementation("com.gorisse.thomas.sceneform:sceneform:1.23.0")
 }

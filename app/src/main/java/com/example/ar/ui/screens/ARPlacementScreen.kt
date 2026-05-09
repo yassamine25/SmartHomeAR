@@ -18,6 +18,7 @@ import androidx.compose.ui.geometry.Offset
 import com.example.ar.R
 import com.example.ar.ui.components.TopBar
 import com.example.ar.ui.components.BottomMenu
+import androidx.compose.ui.viewinterop.AndroidView
 
 @Composable
 fun ARPlacementScreen(
@@ -36,14 +37,7 @@ fun ARPlacementScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        // BACKGROUND
-        Image(
-            painter = painterResource(R.drawable.sofa),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-            alpha = 0.9f
-        )
+
 
         // OVERLAY
         Box(
@@ -116,26 +110,7 @@ fun ARPlacementScreen(
             Spacer(modifier = Modifier.weight(1f))
         }
 
-        // ZONE AR (Canvas)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.85f)
-                .height(200.dp)
-                .align(Alignment.Center)
-        ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val stroke = 6f
-                drawLine(customBlue, Offset(0f, 0f), Offset(size.width, 0f), stroke)
-                drawLine(customBlue, Offset(0f, size.height), Offset(size.width, size.height), stroke)
-                drawLine(customBlue, Offset(0f, 0f), Offset(0f, size.height), stroke)
-                drawLine(customBlue, Offset(size.width, 0f), Offset(size.width, size.height), stroke)
-            }
 
-            val points = listOf(Alignment.TopStart, Alignment.TopEnd, Alignment.BottomStart, Alignment.BottomEnd)
-            points.forEach {
-                Box(modifier = Modifier.size(18.dp).clip(CircleShape).background(Color.White).align(it))
-            }
-        }
 
         // MENU BURGER
         if (isMenuOpen) {
