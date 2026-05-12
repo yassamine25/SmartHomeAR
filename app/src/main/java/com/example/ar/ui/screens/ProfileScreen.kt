@@ -17,9 +17,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ar.ui.components.*
+import com.example.ar.data.RetrofitInstance
 
 @Composable
 fun ProfileScreen(
+    userId: Long?,
     currentScreen: String,
     onNavigateHome: () -> Unit,
     onNavigateToProfile: () -> Unit,
@@ -33,6 +35,27 @@ fun ProfileScreen(
     val customBlue = Color(0xFF1A0BE9)
     val activeColor = Color(0xFF1A0BE9)
     val inactiveColor = Color.Gray
+
+    var nom by remember { mutableStateOf("user") }
+    var prenom by remember { mutableStateOf("") }
+    var emailOrPhone by remember { mutableStateOf("user@gmail.com") }
+
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            try {
+                val response = RetrofitInstance.authApi.getUserById(userId)
+
+                if (response.success) {
+                    nom = response.nom ?: "user"
+                    prenom = response.prenom ?: ""
+                    emailOrPhone = response.emailOrPhone ?: ""
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -77,9 +100,8 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    Text("user", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                    Text("user.1@gmail.com", color = GrayText, fontSize = 14.sp)
-                    Text("+212 601 205 306", color = GrayText, fontSize = 14.sp)
+                    Text("$prenom $nom", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(emailOrPhone, color = GrayText, fontSize = 14.sp)
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))

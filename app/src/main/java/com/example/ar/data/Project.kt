@@ -1,8 +1,8 @@
 package com.example.ar.data
 
-data class ApiProduct(
+data class Project(
     val id: Long,
     val name: String,
-    val price: Double,
-    val image: String?
+    val description: String,
+    val userId: Long
 )

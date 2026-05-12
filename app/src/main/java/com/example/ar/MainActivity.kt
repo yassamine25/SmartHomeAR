@@ -18,12 +18,16 @@ class MainActivity : ComponentActivity() {
                 Surface(modifier = Modifier.fillMaxSize(), color = LightBg) {
                     var currentScreen by remember { mutableStateOf("signin") }
                     var userPhone by remember { mutableStateOf("") }
+                    var connectedUserId by remember { mutableStateOf<Long?>(null) }
 
                     when (currentScreen) {
 
                         "signin" -> SignInScreen(
                             onGoToSignUp = { currentScreen = "signup" },
-                            onLoginSuccess = { currentScreen = "home" }
+                            onLoginSuccess = { userId ->
+                                connectedUserId = userId
+                                currentScreen = "home"
+                            }
                         )
                         "signup" -> SignUpScreen(
                             onRegisterSuccess = { phone -> userPhone = phone; currentScreen = "verification" },
@@ -35,7 +39,7 @@ class MainActivity : ComponentActivity() {
                             onBack = { currentScreen = "signup" }
                         )
 
-                        // --- 2. الشاشات الرئيسية ---
+
                         "home" -> SmartHomeScreen(
                             currentScreen = "home",
                             onNavigateToScanner = { currentScreen = "scanner" },
@@ -58,21 +62,28 @@ class MainActivity : ComponentActivity() {
                         )
 
                         "projects" -> ProjectsScreen(
+                            userId = connectedUserId,
                             currentScreen = "projects",
                             onNavigateHome = { currentScreen = "home" },
                             onNavigateToProfile = { currentScreen = "profile" },
                             onNavigateToProjects = { },
                             onNavigateToCatalogue = { currentScreen = "catalogue" },
-                            onLogout = { currentScreen = "signin" }
+                            onLogout = {
+                                connectedUserId = null
+                                currentScreen = "signin"
+                            }
                         )
-
                         "profile" -> ProfileScreen(
+                            userId = connectedUserId,
                             currentScreen = "profile",
                             onNavigateHome = { currentScreen = "home" },
                             onNavigateToProfile = { },
                             onNavigateToProjects = { currentScreen = "projects" },
-                            onNavigateToCatalogue = {  currentScreen = "catalogue" },
-                            onLogout = { currentScreen = "signin" }
+                            onNavigateToCatalogue = { currentScreen = "catalogue" },
+                            onLogout = {
+                                connectedUserId = null
+                                currentScreen = "signin"
+                            }
                         )
 
                         "scanner" -> ScannerARScreen(

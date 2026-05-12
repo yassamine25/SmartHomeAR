@@ -14,18 +14,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ar.R
+import com.example.ar.data.Project
+import com.example.ar.data.RetrofitInstance
 import com.example.ar.ui.components.*
-import com.example.ar.ui.components.TopBar
-
-
-data class Project(
-    val title: String,
-    val date: String,
-    val image: Int
-)
 
 @Composable
 fun ProjectsScreen(
+    userId: Long?,
     currentScreen: String,
     onNavigateHome: () -> Unit,
     onNavigateToProfile: () -> Unit,
@@ -33,30 +28,36 @@ fun ProjectsScreen(
     onNavigateToCatalogue: () -> Unit,
     onLogout: () -> Unit
 ) {
-
     var isMenuOpen by remember { mutableStateOf(false) }
+    var projects by remember { mutableStateOf<List<Project>>(emptyList()) }
+
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            try {
+                projects = RetrofitInstance.projectApi.getProjectsByUser(userId)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     val customBlue = Color(0xFF1A0BE9)
     val activeColor = Color(0xFF1A0BE9)
     val inactiveColor = Color.Gray
 
-    // LISTE DES PROJETS (EN DEHORS DU LazyColumn)
-    val projects = listOf(
-        Project("Salon Moderne", "12/04/2024", R.drawable.salon),
-        Project("Chambre classique", "05/04/2024", R.drawable.chambre),
-        Project("Bureau", "28/03/2024", R.drawable.bureau)
-    )
-
     Box(modifier = Modifier.fillMaxSize()) {
 
-        Column(modifier = Modifier.fillMaxSize().padding(20.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp)
+        ) {
 
-            // TOP BAR
             TopBar(
                 onMenuClick = { isMenuOpen = !isMenuOpen },
                 onLogoClick = { onNavigateHome() }
             )
 
-            // TITLE
             Text(
                 text = "Mes Projets AR",
                 fontSize = 20.sp,
@@ -64,7 +65,6 @@ fun ProjectsScreen(
                 modifier = Modifier.padding(20.dp)
             )
 
-            // LISTE
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -82,15 +82,22 @@ fun ProjectsScreen(
                 }
 
                 items(projects) { project ->
+
+                    val imageRes = when (project.name) {
+                        "Salon Moderne" -> R.drawable.salon
+                        "Chambre classique" -> R.drawable.chambre
+                        "Bureau" -> R.drawable.bureau
+                        else -> R.drawable.salon
+                    }
+
                     ProjectCard(
-                        title = project.title,
-                        date = project.date,
-                        imageRes = project.image
+                        title = project.name,
+                        date = project.description,
+                        imageRes = imageRes
                     )
                 }
             }
         }
-
 
         if (isMenuOpen) {
             Box(
@@ -136,10 +143,13 @@ fun ProjectsScreen(
                     color = if (currentScreen == "catalogue") activeColor else inactiveColor,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.fillMaxWidth().clickable {
-                        isMenuOpen = false
-                        onNavigateToCatalogue()
-                    }.padding(12.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            isMenuOpen = false
+                            onNavigateToCatalogue()
+                        }
+                        .padding(12.dp)
                 )
 
                 Text(
@@ -147,10 +157,13 @@ fun ProjectsScreen(
                     color = if (currentScreen == "projects") activeColor else inactiveColor,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.fillMaxWidth().clickable {
-                        isMenuOpen = false
-                        onNavigateToProjects()
-                    }.padding(12.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            isMenuOpen = false
+                            onNavigateToProjects()
+                        }
+                        .padding(12.dp)
                 )
 
                 Text(
@@ -158,11 +171,15 @@ fun ProjectsScreen(
                     color = if (currentScreen == "profile") activeColor else inactiveColor,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.fillMaxWidth().clickable {
-                        isMenuOpen = false
-                        onNavigateToProfile()
-                    }.padding(12.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            isMenuOpen = false
+                            onNavigateToProfile()
+                        }
+                        .padding(12.dp)
                 )
+
                 Spacer(modifier = Modifier.height(30.dp))
 
                 Text(
@@ -180,7 +197,6 @@ fun ProjectsScreen(
                 )
             }
         }
-
 
         BottomMenu(
             modifier = Modifier

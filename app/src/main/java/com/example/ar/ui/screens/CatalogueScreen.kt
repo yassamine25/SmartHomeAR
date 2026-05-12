@@ -59,7 +59,7 @@ fun CatalogueScreen(
 
     LaunchedEffect(Unit) {
         try {
-            products = RetrofitInstance.api.getProducts()
+            products = RetrofitInstance.productApi.getProducts()
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
@@ -129,10 +129,19 @@ fun CatalogueScreen(
 
             // Produits
             gridItems(products) { product ->
+
+                val imageRes = when (product.image) {
+                    "chaise" -> R.drawable.chaise
+                    "table1" -> R.drawable.table1
+                    "table2" -> R.drawable.table2
+                    "sofa" -> R.drawable.sofa
+                    else -> R.drawable.sofa
+                }
+
                 ProductCard(
                     name = product.name,
                     price = "${product.price} DH",
-                    image = R.drawable.sofa,
+                    image = imageRes,
                     onClickAR = {
                         onNavigateToAR()
                     }
@@ -238,12 +247,7 @@ fun ProductCardItem(product: Product) {
     ) {
         Box {
             Column(modifier = Modifier.padding(10.dp)) {
-                Image(
-                    painter = painterResource(id = product.image),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxWidth().height(100.dp).clip(RoundedCornerShape(12.dp))
-                )
+
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(product.name, fontWeight = FontWeight.Bold, maxLines = 1)
                 Text(product.price, color = Color(0xFF1A0BE9), fontSize = 12.sp)
