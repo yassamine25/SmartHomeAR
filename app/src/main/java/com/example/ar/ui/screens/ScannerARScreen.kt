@@ -1,5 +1,14 @@
 package com.example.ar.ui.screens
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,50 +18,56 @@ import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.text.font.*
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.*
-import com.example.ar.R
-
-import com.example.ar.ui.components.StepCard
-import com.example.ar.ui.components.CategoryItem
-import com.example.ar.ui.components.BottomMenu
-import com.example.ar.ui.components.TopBar
-
-import android.Manifest
-import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
 import androidx.compose.ui.platform.LocalContext
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.*
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.runtime.getValue
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import com.example.ar.R
+import com.example.ar.ui.components.BottomMenu
+import com.example.ar.ui.components.CategoryItem
+import com.example.ar.ui.components.StepCard
+import com.example.ar.ui.components.TopBar
 
 @Composable
 fun ScannerARScreen(
+    currentScreen: String,
     onNavigateToAR: () -> Unit,
     onNavigateHome: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToProjects: () -> Unit,
-    onNavigateToCatalogue: () -> Unit
+    onNavigateToCatalogue: () -> Unit,
+    onLogout: () -> Unit
 ) {
     var isMenuOpen by remember { mutableStateOf(false) }
     val customBlue = Color(0xFF1A0BE9)
+    val inactiveColor = Color.Gray
+    val activeColor = Color(0xFF1A0BE9)
     val context = LocalContext.current
-    val lifecycleOwner = context as LifecycleOwner
+    val lifecycleOwner = LocalContext.current as LifecycleOwner
+
+
+    val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
+    DisposableEffect(Unit) {
+        onDispose {
+            try {
+                val cameraProvider = cameraProviderFuture.get()
+                cameraProvider.unbindAll() // Libère la caméra pour l'AR
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
 
     val gradient = Brush.horizontalGradient(
         listOf(Color(0xFF1A0BE9), Color(0xFF6C63FF))
     )
-
-
 
     var hasCameraPermission by remember {
         mutableStateOf(
@@ -75,11 +90,8 @@ fun ScannerARScreen(
         }
     }
 
-    // ✅ STRUCTURE PROPRE
     Box(modifier = Modifier.fillMaxSize()) {
-
         if (!hasCameraPermission) {
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -93,25 +105,15 @@ fun ScannerARScreen(
                     fontWeight = FontWeight.Bold
                 )
             }
-
         } else {
-
-            // ✅ UI NORMALE
-
-            // BACKGROUND
             AndroidView(
-                factory = { context ->
-                    val previewView = androidx.camera.view.PreviewView(context)
-
-                    val cameraProviderFuture = androidx.camera.lifecycle.ProcessCameraProvider.getInstance(context)
-
+                factory = { ctx ->
+                    val previewView = PreviewView(ctx)
                     cameraProviderFuture.addListener({
                         val cameraProvider = cameraProviderFuture.get()
-
-                        val preview = androidx.camera.core.Preview.Builder().build()
+                        val preview = Preview.Builder().build()
                         preview.setSurfaceProvider(previewView.surfaceProvider)
-
-                        val cameraSelector = androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
+                        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
                         try {
                             cameraProvider.unbindAll()
@@ -123,47 +125,34 @@ fun ScannerARScreen(
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
-
-                    }, androidx.core.content.ContextCompat.getMainExecutor(context))
-
+                    }, ContextCompat.getMainExecutor(ctx))
                     previewView
                 },
                 modifier = Modifier.fillMaxSize()
             )
 
-            // OVERLAY
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Transparent)
-            )
-
-            // NAVBAR + TITLE
+            // UI Layer
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(20.dp)
                     .align(Alignment.TopStart)
             ) {
-
                 TopBar(
                     onMenuClick = { isMenuOpen = !isMenuOpen },
                     onLogoClick = { onNavigateHome() }
                 )
-
                 Spacer(modifier = Modifier.height(12.dp))
-
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
                         .background(Color(0xFF6C63FF))
                         .padding(horizontal = 14.dp, vertical = 6.dp)
+                        .clickable { onNavigateHome() }
                 ) {
                     Text("Annuler", color = Color.White, fontSize = 12.sp)
                 }
-
                 Spacer(modifier = Modifier.height(8.dp))
-
                 Text(
                     text = buildAnnotatedString {
                         append("Scanner la pièce et ")
@@ -183,68 +172,12 @@ fun ScannerARScreen(
                 )
             }
 
-            // CENTRE
-            Column(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 160.dp)
-                    .padding(horizontal = 20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    StepCard("1", "Scannez\nlentement", R.drawable.ic_camera)
-                    StepCard("2", "Détectez\nle sol", R.drawable.ic_cube)
-                    StepCard("3", "Placez\nvotre meuble", R.drawable.ic_heart)
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(30.dp))
-                        .background(gradient)
-                        .shadow(10.dp, RoundedCornerShape(30.dp))
-                        .padding(horizontal = 20.dp, vertical = 12.dp)
-                ) {
-                    Text(
-                        "Sol détecté\nChoisissez un meuble à placer",
-                        color = Color.White,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Color.White.copy(alpha = 0.2f))
-                        .border(1.dp, Color.Blue.copy(alpha = 0.3f), RoundedCornerShape(20.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        "Surface détectée avec succès",
-                        color = Color.White,
-                        fontWeight = FontWeight.Medium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-
-            // BAS
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 90.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(0.95f)
@@ -258,16 +191,14 @@ fun ScannerARScreen(
                     Box(Modifier.weight(1f), contentAlignment = Alignment.Center) { CategoryItem("", R.drawable.table1) }
                     Box(Modifier.weight(1f), contentAlignment = Alignment.Center) { CategoryItem("", R.drawable.table2) }
                 }
-
                 Spacer(modifier = Modifier.height(10.dp))
-
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(30.dp))
                         .background(gradient)
                         .shadow(10.dp, RoundedCornerShape(30.dp))
                         .clickable {
-                            onNavigateToAR()
+                            onNavigateToAR() // Va vers ARPlacementScreen
                         }
                         .padding(horizontal = 24.dp, vertical = 10.dp)
                 ) {
@@ -275,7 +206,6 @@ fun ScannerARScreen(
                 }
             }
 
-            // MENU BURGER
             if (isMenuOpen) {
                 Box(
                     modifier = Modifier
@@ -291,19 +221,92 @@ fun ScannerARScreen(
                         .background(Color.White)
                         .padding(20.dp)
                 ) {
-                    Text("SmartHome", fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Text("Accueil", modifier = Modifier.clickable { isMenuOpen = false; onNavigateHome() })
-                    Text("Catalogue", modifier = Modifier.clickable { isMenuOpen = false; onNavigateToCatalogue() })
-                    Text("Mes Projets", modifier = Modifier.clickable { isMenuOpen = false; onNavigateToProjects() })
-                    Text("Profil", modifier = Modifier.clickable { isMenuOpen = false; onNavigateToProfile() })
+
+                    Text(
+                        "SmartHome",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = customBlue
+                    )
+
+                    Spacer(modifier = Modifier.height(30.dp))
+
+                    Text(
+                        "Accueil",
+                        color = if (currentScreen == "home") activeColor else inactiveColor,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                isMenuOpen = false
+                                onNavigateHome()
+                            }
+                            .padding(12.dp)
+                    )
+
+                    Text(
+                        "Catalogue",
+                        color = if (currentScreen == "catalogue") activeColor else inactiveColor,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                isMenuOpen = false
+                                onNavigateToCatalogue()
+                            }
+                            .padding(12.dp)
+                    )
+
+                    Text(
+                        "Mes Projets",
+                        color = if (currentScreen == "projects") activeColor else inactiveColor,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                isMenuOpen = false
+                                onNavigateToProjects()
+                            }
+                            .padding(12.dp)
+                    )
+
+                    Text(
+                        "Profil",
+                        color = if (currentScreen == "profile") activeColor else inactiveColor,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                isMenuOpen = false
+                                onNavigateToProfile()
+                            }
+                            .padding(12.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(30.dp))
+
+                    Text(
+                        "Se déconnecter",
+                        color = Color.Red,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                isMenuOpen = false
+                                onLogout()
+                            }
+                            .padding(12.dp)
+                    )
                 }
             }
 
             BottomMenu(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth(0.9f),
+                modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(0.9f),
                 selectedItem = -1,
                 onNavigateHome = onNavigateHome,
                 onNavigateToProfile = onNavigateToProfile,

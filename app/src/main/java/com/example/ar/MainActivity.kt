@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import com.example.ar.ui.screens.*
 import com.example.ar.ui.components.LightBg
@@ -16,12 +17,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = LightBg) {
-                    var currentScreen by remember { mutableStateOf("signin") }
-                    var userPhone by remember { mutableStateOf("") }
-                    var connectedUserId by remember { mutableStateOf<Long?>(null) }
+
+                    var currentScreen by rememberSaveable { mutableStateOf("signin") }
+                    var userPhone by rememberSaveable { mutableStateOf("") }
+                    var connectedUserId by rememberSaveable { mutableStateOf<Long?>(null) }
 
                     when (currentScreen) {
-
                         "signin" -> SignInScreen(
                             onGoToSignUp = { currentScreen = "signup" },
                             onLoginSuccess = { userId ->
@@ -38,8 +39,6 @@ class MainActivity : ComponentActivity() {
                             onVerifySuccess = { currentScreen = "home" },
                             onBack = { currentScreen = "signup" }
                         )
-
-
                         "home" -> SmartHomeScreen(
                             currentScreen = "home",
                             onNavigateToScanner = { currentScreen = "scanner" },
@@ -49,7 +48,6 @@ class MainActivity : ComponentActivity() {
                             onNavigateToCatalogue = { currentScreen = "catalogue" },
                             onLogout = { currentScreen = "signin" }
                         )
-
                         "catalogue" -> CatalogueScreen(
                             currentScreen = "catalogue",
                             onNavigateHome = { currentScreen = "home" },
@@ -58,9 +56,7 @@ class MainActivity : ComponentActivity() {
                             onNavigateToCatalogue = { },
                             onLogout = { currentScreen = "signin" },
                             onNavigateToAR = { currentScreen = "ar" }
-
                         )
-
                         "projects" -> ProjectsScreen(
                             userId = connectedUserId,
                             currentScreen = "projects",
@@ -85,20 +81,29 @@ class MainActivity : ComponentActivity() {
                                 currentScreen = "signin"
                             }
                         )
-
                         "scanner" -> ScannerARScreen(
+                            currentScreen = "scanner",
                             onNavigateToAR = { currentScreen = "ar" },
                             onNavigateHome = { currentScreen = "home" },
                             onNavigateToProfile = { currentScreen = "profile" },
                             onNavigateToProjects = { currentScreen = "projects" },
-                            onNavigateToCatalogue = { currentScreen = "catalogue" }
+                            onNavigateToCatalogue = { currentScreen = "catalogue" },
+                            onLogout = {
+                                connectedUserId = null
+                                currentScreen = "signin"
+                            }
                         )
-
                         "ar" -> ARPlacementScreen(
+                            currentScreen = "ar",
+                            userId = connectedUserId,
                             onNavigateHome = { currentScreen = "home" },
                             onNavigateToProfile = { currentScreen = "profile" },
                             onNavigateToProjects = { currentScreen = "projects" },
-                            onNavigateToCatalogue = { currentScreen = "catalogue" }
+                            onNavigateToCatalogue = { currentScreen = "catalogue" },
+                            onLogout = {
+                                connectedUserId = null
+                                currentScreen = "signin"
+                            }
                         )
                     }
                 }

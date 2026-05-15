@@ -20,7 +20,7 @@ android {
     }
 
     composeOptions {
-        // Kotlin 1.9.24 => Compose Compiler 1.5.14
+
         kotlinCompilerExtensionVersion = "1.5.14"
     }
     
@@ -66,6 +66,12 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.google.code.gson:gson:2.11.0")
+
+
+
+    implementation("com.google.ar:core:1.45.0")
+    implementation("com.gorisse.thomas.sceneform:sceneform:1.21.0")
+    implementation("com.gorisse.thomas.sceneform:ux:1.21.0")
 
 
 }

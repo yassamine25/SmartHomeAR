@@ -19,14 +19,31 @@ import com.example.ar.R
 import com.example.ar.ui.components.TopBar
 import com.example.ar.ui.components.BottomMenu
 
+import com.example.ar.data.Project
+import com.example.ar.data.RetrofitInstance
+import kotlinx.coroutines.launch
+
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
+
 @Composable
 fun ARPlacementScreen(
+    currentScreen: String,
+    userId: Long?,
     onNavigateHome: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToProjects: () -> Unit,
-    onNavigateToCatalogue: () -> Unit
+    onNavigateToCatalogue: () -> Unit,
+    onLogout: () -> Unit
 ) {
     var isMenuOpen by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
+    var message by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
+    val activeColor = Color(0xFF1A0BE9)
+    val inactiveColor = Color.Gray
 
     val customBlue = Color(0xFF1A0BE9)
     val gradient = Brush.horizontalGradient(
@@ -59,28 +76,61 @@ fun ARPlacementScreen(
                 onLogoClick = { onNavigateHome() }
             )
 
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Color.White)
+                    .clickable {
+                        context.startActivity(
+                            Intent(context, RealARActivity::class.java)
+                        )
+                    }
+                    .padding(horizontal = 20.dp, vertical = 8.dp)
+            ) {
+                Text("Tester vrai AR", color = customBlue)
+            }
+
+
+
+
+
+
+
+
             Spacer(modifier = Modifier.height(30.dp))
 
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(gradient)
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text("Annuler", color = Color.White, fontSize = 12.sp)
-                }
-
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(gradient)
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text("Déplacer", color = Color.White, fontSize = 12.sp)
-                }
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(gradient)
+                    .clickable {
+                        scope.launch {
+                            if (userId != null) {
+                                try {
+                                    RetrofitInstance.projectApi.createProject(
+                                        Project(
+                                            name = "Nouveau placement AR",
+                                            description = "Sauvegardé depuis AR",
+                                            userId = userId,
+                                            image = "salon"
+                                        )
+                                    )
+                                    message = "Projet sauvegardé"
+                                    onNavigateToProjects()
+                                } catch (e: Exception) {
+                                    message = "Erreur sauvegarde"
+                                    e.printStackTrace()
+                                }
+                            }
+                        }
+                    }
+                    .padding(horizontal = 20.dp, vertical = 8.dp)
+            ) {
+                Text("Valider", color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -96,17 +146,6 @@ fun ARPlacementScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(gradient)
-                    .padding(horizontal = 20.dp, vertical = 8.dp)
-            ) {
-                Text("Valider", color = Color.White)
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
         }
 
         Box(
@@ -142,66 +181,72 @@ fun ARPlacementScreen(
         }
 
         if (isMenuOpen) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.4f))
-                    .clickable { isMenuOpen = false }
-            )
+            Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { isMenuOpen = false })
 
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(220.dp)
-                    .background(Color.White)
-                    .padding(20.dp)
-            ) {
-                Text("SmartHome", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-
-                Spacer(modifier = Modifier.height(20.dp))
+            Column(modifier = Modifier.fillMaxHeight().width(220.dp).background(Color.White).padding(20.dp)) {
+                Text("SmartHome", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = customBlue)
+                Spacer(modifier = Modifier.height(30.dp))
 
                 Text(
                     "Accueil",
+                    color = if (currentScreen == "home") activeColor else inactiveColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
                             isMenuOpen = false
                             onNavigateHome()
                         }
-                        .padding(10.dp)
+                        .padding(12.dp)
                 )
 
                 Text(
                     "Catalogue",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            isMenuOpen = false
-                            onNavigateToCatalogue()
-                        }
-                        .padding(10.dp)
+                    color = if (currentScreen == "catalogue") activeColor else inactiveColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.fillMaxWidth().clickable {
+                        isMenuOpen = false
+                        onNavigateToCatalogue()
+                    }.padding(12.dp)
                 )
 
                 Text(
                     "Mes Projets",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            isMenuOpen = false
-                            onNavigateToProjects()
-                        }
-                        .padding(10.dp)
+                    color = if (currentScreen == "projects") activeColor else inactiveColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.fillMaxWidth().clickable {
+                        isMenuOpen = false
+                        onNavigateToProjects()
+                    }.padding(12.dp)
                 )
 
                 Text(
                     "Profil",
+                    color = if (currentScreen == "profile") activeColor else inactiveColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.fillMaxWidth().clickable {
+                        isMenuOpen = false
+                        onNavigateToProfile()
+                    }.padding(12.dp)
+                )
+                Spacer(modifier = Modifier.height(30.dp))
+
+                Text(
+                    "Se déconnecter",
+                    color = Color.Red,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
                             isMenuOpen = false
-                            onNavigateToProfile()
+                            onLogout()
                         }
-                        .padding(10.dp)
+                        .padding(12.dp)
                 )
             }
         }
